@@ -105,10 +105,16 @@ while dead == False:
 			print("Better luck next time!")
 			dead = True
 	elif command == "sad":
-		print("Do you want a hug? [yes/no]")
-		ans = input("> ")
-		if inhabitant.hug(ans) == True:
-			print("Yay!")
+		if inhabitant == None:
+		  print("There is no one here to hug :(")
 		else:
-			print("Better luck next time!")
-			dead = True
+			if isinstance(inhabitant, Enemy):
+				print("I wouldn't do that if I were you...")
+			else:
+				print("Do you want a hug? [yes/no]")
+				ans = input("> ")
+				if inhabitant.hug(ans) == True:
+					print("Yay!")
+				else:
+					print("Better luck next time!")
+					dead = True
