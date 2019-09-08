@@ -4,6 +4,7 @@ class Room():
 		self.description = None
 		self.linked_rooms = {}
 		self.character = None
+		self.item = None
 		
 	def set_character(self, new_character):
 		self.character = new_character
@@ -13,6 +14,13 @@ class Room():
 		
 	def set_name(self, room_name):
 		self.name = room_name
+		
+	# set and get item name
+	def set_item(self, item_name):
+		self.item = item_name
+		
+	def get_item(self):
+		return self.item
 		
 	def set_description(self, room_description):
 		self.description = room_description

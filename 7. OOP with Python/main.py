@@ -1,5 +1,6 @@
 from room import Room
 from character import Enemy, Friend
+from item import Item
 
 kitchen = Room("Kitchen")
 # kitchen.set_name("Kitchen")
@@ -24,13 +25,18 @@ dave = Enemy("Dave", "A smelly zombie")
 dave.set_conversation("I want your brains!")
 
 # Set Dave's weakness attribute
-dave.set_weakness("water")
+dave.set_weakness("cheese")
+dave.set_enemies_defeated(5)
 
 # Set Dave's item to steal attribute
 dave.set_item_to_steal("ring")
 
 # Add Dave to dining hall
 dining_hall.set_character(dave)
+
+cheese = Item("cheese")
+cheese.set_description("A large smelly block of cheese")
+ballroom.set_item(cheese)
 
 # Add new friendly character
 catrina = Friend("Catrina","A friendly skeleton")
@@ -41,6 +47,7 @@ catrina.set_conversation("Why hello there.")
 ballroom.set_character(catrina)
 
 current_room = kitchen
+backpack = []
 
 dead = False
 
@@ -49,9 +56,12 @@ while dead == False:
 	current_room.get_details()
 	
 	inhabitant = current_room.get_character()
-	
 	if inhabitant is not None:
 		inhabitant.describe()
+	
+	item = current_room.get_item()
+	if item is not None:
+		item.describe()
 	
 	command = input("> ")
 	
@@ -65,26 +75,36 @@ while dead == False:
 		print("You said: "+response)
 	elif command == "fight":
 		# Fight with the inhabitant
+		print("Defeat " + inhabitant.get_name() + " " + str(inhabitant.get_enemies_defeated() - inhabitant.get_enemies_defeats())+" times to win.")
 		print("What will you fight with?")
 		fight_with = input("> ")
-		if inhabitant.fight(fight_with) == True:
-			# What happens if you win?
-			print("You win!")
-			msg = "Move to the next room."
-			if current_room == kitchen:
-				print("Move to dining hall [south]")
-				command = input("> ")
-			elif current_room == dining_hall:
-				print("Move to kitchen [north] or ballroom [west]")
-				command = input("> ")
+		
+		if fight_with in backpack:
+			# fight enemy
+			if inhabitant.fight(fight_with) == True:
+				if inhabitant.get_enemies_defeats() < inhabitant.get_enemies_defeated():
+					print("Good job! Keep on fighting to win!")
+				else:				
+					# What happens if you win?
+					print("You win!")
+					msg = "Move to the next room."
+					if current_room == kitchen:
+						print("Move to dining hall [south]")
+						command = input("> ")
+					elif current_room == dining_hall:
+						print("Move to kitchen [north] or ballroom [west]")
+						command = input("> ")
+					else:
+						print("Move to dining room [east]")
+						command = input("> ")
+					current_room = current_room.move(command)
 			else:
-				print("Move to dining room [east]")
-				command = input("> ")
-			current_room = current_room.move(command)
+				# What happens if you loose?
+				print("Better luck next time!")
+				dead = True
 		else:
-			# What happens if you loose?
-			print("Better luck next time!")
-			dead = True
+			# Don't have item
+			print("Sorry, you do not have "+fight_with+" in your backpack.")
 	elif command == "steal":
 		print("What will you steal?")
 		item_steal = input("> ")
@@ -118,3 +138,9 @@ while dead == False:
 				else:
 					print("Better luck next time!")
 					dead = True
+	elif command == "take":
+		if item is not None:
+			backpack.append(item.get_name())
+			current_room.set_item(None)
+		else:
+			print("Sorry! No items to collect in the "+current_room.get_name()+".")
